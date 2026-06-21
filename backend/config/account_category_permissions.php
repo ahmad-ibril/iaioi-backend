@@ -1,0 +1,76 @@
+<?php
+
+return [
+    'regular_user' => ['*'],
+
+    'chalet_owner' => ['chalets'],
+    'sports_field_owner' => ['sports-fields'],
+    'wedding_hall_owner' => ['wedding-halls'],
+    'hotel_owner' => ['hotels'],
+
+    'tourism_office_owner' => ['tourism-offices', 'travel-agencies'],
+    'travel_agency_owner' => ['travel-agencies', 'tourism-offices'],
+    'transport_company_owner' => [
+        'cars',
+        'buses',
+        'tourist-transport-companies',
+        'private-transport',
+    ],
+    'commercial_property_owner' => [
+        'apartments-rent',
+        'commercial-complexes',
+        'commercial-offices',
+        'commercial-shops',
+    ],
+
+    'service_provider' => [
+        'construction-workers',
+        'maintenance-workers',
+        'electricians',
+        'plumbers',
+        'carpenters',
+        'blacksmiths',
+        'painters',
+        'ac-technicians',
+        'aluminum-technicians',
+        'tile-technicians',
+        'cleaning-workers',
+        'hospitality-services',
+        'domestic-workers-recruitment',
+        'furniture-moving',
+        'private-transport',
+    ],
+    'technician' => [
+        'construction-workers',
+        'maintenance-workers',
+        'electricians',
+        'plumbers',
+        'carpenters',
+        'blacksmiths',
+        'painters',
+        'ac-technicians',
+        'aluminum-technicians',
+        'tile-technicians',
+        'cleaning-workers',
+    ],
+
+    'nursery_owner' => [
+        'garden-design-landscaping',
+        'tree-trimming',
+        'grass-planting',
+        'irrigation-systems',
+        'garden-maintenance',
+        'nurseries',
+        'tree-types',
+        'plant-types',
+        'farming-supplies',
+    ],
+    'turkish_bath_owner' => ['turkish-baths'],
+    'amusement_city_owner' => [
+        'amusement-parks',
+        'indoor-amusement-parks',
+        'water-parks',
+    ],
+    'airline_company_owner' => ['airlines'],
+    'parcel_service_owner' => ['international-parcel-offices'],
+];
