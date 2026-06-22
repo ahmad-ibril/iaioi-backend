@@ -6,10 +6,17 @@ use Illuminate\Http\Request;
 define('LARAVEL_START', microtime(true));
 
 $_SERVER['HTTP_ACCEPT'] = 'application/json';
-$_SERVER['SCRIPT_NAME'] = '/index.php';
-$_SERVER['PHP_SELF'] = '/index.php';
 
 $basePath = __DIR__.'/../../backend';
+
+// Laravel owns the /api prefix. Do not let Symfony remove it as a script path.
+$_SERVER['SCRIPT_NAME'] = '/index.php';
+$_SERVER['PHP_SELF'] = '/index.php';
+unset(
+    $_SERVER['PATH_INFO'],
+    $_SERVER['ORIG_PATH_INFO'],
+    $_SERVER['ORIG_SCRIPT_NAME'],
+);
 
 if (file_exists($maintenance = $basePath.'/storage/framework/maintenance.php')) {
     require $maintenance;
