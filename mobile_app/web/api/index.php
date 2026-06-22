@@ -9,13 +9,19 @@ $_SERVER['HTTP_ACCEPT'] = 'application/json';
 
 $basePath = __DIR__.'/../../backend';
 
-// Laravel owns the /api prefix. Do not let Symfony remove it as a script path.
+header('X-IAIOI-API-Front: 2026-06-22.2');
+
+// Force a root front controller even when Hostinger appends PATH_INFO to it.
 $_SERVER['SCRIPT_NAME'] = '/index.php';
 $_SERVER['PHP_SELF'] = '/index.php';
+$_SERVER['SCRIPT_FILENAME'] = $basePath.'/public/index.php';
+$_SERVER['DOCUMENT_ROOT'] = dirname(__DIR__);
 unset(
     $_SERVER['PATH_INFO'],
     $_SERVER['ORIG_PATH_INFO'],
     $_SERVER['ORIG_SCRIPT_NAME'],
+    $_SERVER['REDIRECT_SCRIPT_URL'],
+    $_SERVER['REDIRECT_SCRIPT_URI'],
 );
 
 if (file_exists($maintenance = $basePath.'/storage/framework/maintenance.php')) {
