@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../routes/app_routes.dart';
 import 'auth_controller.dart';
+import 'google_auth_button.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -131,12 +132,9 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                 ),
                 const SizedBox(height: 10),
-                Obx(
-                  () => OutlinedButton.icon(
-                    onPressed: auth.isLoading.value ? null : _googleRegister,
-                    icon: const Icon(Icons.g_mobiledata),
-                    label: const Text('التسجيل بجوجل'),
-                  ),
+                GoogleAuthButton(
+                  isSignUp: true,
+                  onSuccess: () => Get.offNamed(AppRoutes.accountType),
                 ),
                 const SizedBox(height: 10),
                 TextButton(
@@ -175,11 +173,6 @@ class _RegisterPageState extends State<RegisterPage> {
       passwordConfirmation: confirmController.text,
     );
 
-    if (ok) Get.offNamed(AppRoutes.accountType);
-  }
-
-  Future<void> _googleRegister() async {
-    final ok = await Get.find<UserAuthController>().loginWithGoogle();
     if (ok) Get.offNamed(AppRoutes.accountType);
   }
 }

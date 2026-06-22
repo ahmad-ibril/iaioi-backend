@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -84,15 +85,22 @@ class UserAuthController extends GetxController {
   }
 
   Future<bool> loginWithGoogle() async {
+    if (kIsWeb) {
+      error.value = 'استخدم زر Google الرسمي لإتمام تسجيل الدخول.';
+      return false;
+    }
+
     return _authenticate(() async {
       await _ensureGoogleInitialized();
       final account = await GoogleSignIn.instance.authenticate();
-      final idToken = account.authentication.idToken;
-      if (idToken == null || idToken.isEmpty) {
-        throw Exception('Missing Google ID token');
-      }
-      return _repository.loginWithGoogleIdToken(idToken);
+      return _googleSession(account);
     });
+  }
+
+  Future<void> initializeGoogle() => _ensureGoogleInitialized();
+
+  Future<bool> loginWithGoogleAccount(GoogleSignInAccount account) {
+    return _authenticate(() => _googleSession(account));
   }
 
   Future<void> loadAccountTypes() async {
@@ -186,7 +194,17 @@ class UserAuthController extends GetxController {
 
     if (data is Map<String, dynamic>) {
       final message = data['message'];
-      if (message is String && message.isNotEmpty) return message;
+      if (message is String && message.isNotEmpty) {
+        final normalized = message.toLowerCase();
+        if (normalized.contains('sqlstate') ||
+            normalized.contains('queryexception') ||
+            normalized.contains('insert into') ||
+            normalized.contains('column not found')) {
+          return 'تعذر حفظ بيانات الحساب حالياً. حاول مرة أخرى.';
+        }
+
+        return message;
+      }
 
       final errors = data['errors'];
       if (errors is Map && errors.isNotEmpty) {
@@ -219,15 +237,28 @@ class UserAuthController extends GetxController {
   Future<void> _ensureGoogleInitialized() async {
     if (_googleInitialized) return;
 
+    if (kIsWeb && AppConfig.googleClientId.isEmpty) {
+      throw StateError('GOOGLE_CLIENT_ID is not configured');
+    }
+
     await GoogleSignIn.instance.initialize(
       clientId: AppConfig.googleClientId.isEmpty
           ? null
           : AppConfig.googleClientId,
-      serverClientId: AppConfig.googleServerClientId.isEmpty
+      serverClientId: kIsWeb || AppConfig.googleServerClientId.isEmpty
           ? null
           : AppConfig.googleServerClientId,
     );
     _googleInitialized = true;
+  }
+
+  Future<AuthSession> _googleSession(GoogleSignInAccount account) async {
+    final idToken = account.authentication.idToken;
+    if (idToken == null || idToken.isEmpty) {
+      throw StateError('Missing Google ID token');
+    }
+
+    return _repository.loginWithGoogleIdToken(idToken);
   }
 }
 

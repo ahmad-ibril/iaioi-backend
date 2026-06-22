@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 
 import '../../routes/app_routes.dart';
 import 'auth_controller.dart';
+import 'google_auth_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -105,12 +106,9 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                     ),
                     const SizedBox(height: 10),
-                    Obx(
-                      () => OutlinedButton.icon(
-                        onPressed: auth.isLoading.value ? null : _googleLogin,
-                        icon: const Icon(Icons.g_mobiledata),
-                        label: const Text('الدخول بجوجل'),
-                      ),
+                    GoogleAuthButton(
+                      isSignUp: false,
+                      onSuccess: () => Get.offNamed(AppRoutes.home),
                     ),
                     const SizedBox(height: 10),
                     TextButton(
@@ -146,10 +144,5 @@ class _LoginPageState extends State<LoginPage> {
   Future<void> _continueAsGuest() async {
     await Get.find<UserAuthController>().clearSession();
     Get.offAllNamed(AppRoutes.home);
-  }
-
-  Future<void> _googleLogin() async {
-    final ok = await Get.find<UserAuthController>().loginWithGoogle();
-    if (ok) Get.offNamed(AppRoutes.home);
   }
 }
