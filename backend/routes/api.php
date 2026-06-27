@@ -16,6 +16,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\AvailabilitySlotController;
 use App\Http\Controllers\Api\V1\BookingRequestController;
 use App\Http\Controllers\Api\V1\CategoryController;
+use App\Http\Controllers\Api\V1\DiagnosticsController;
 use App\Http\Controllers\Api\V1\FavoriteController;
 use App\Http\Controllers\Api\V1\FilterOptionController;
 use App\Http\Controllers\Api\V1\HomeController;
@@ -24,39 +25,12 @@ use App\Http\Controllers\Api\V1\LocationController;
 use App\Http\Controllers\Api\V1\UserListingController;
 use App\Http\Controllers\Api\V1\VerificationRequestController;
 use App\Http\Controllers\Api\V1\WantedRequestController;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/debug', function (): JsonResponse {
-    $databaseConnected = false;
-
-    try {
-        DB::connection()->getPdo();
-        $databaseConnected = true;
-    } catch (\Throwable) {
-        // The endpoint reports connection state without exposing credentials.
-    }
-
-    return response()->json([
-        'laravel_version' => app()->version(),
-        'php_version' => PHP_VERSION,
-        'database_connected' => $databaseConnected,
-        'app_url' => config('app.url'),
-        'environment' => app()->environment(),
-    ]);
-});
+Route::get('/debug', [DiagnosticsController::class, 'debug']);
 
 Route::prefix('v1')->group(function (): void {
-    Route::get('/health', function (): JsonResponse {
-        DB::connection()->getPdo();
-
-        return response()->json([
-            'status' => 'ok',
-            'database' => DB::connection()->getDatabaseName(),
-            'time' => now(),
-        ]);
-    });
+    Route::get('/health', [DiagnosticsController::class, 'health']);
     Route::get('/home', HomeController::class);
 
     Route::get('/categories', [CategoryController::class, 'index']);

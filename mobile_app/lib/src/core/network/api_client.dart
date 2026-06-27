@@ -139,6 +139,8 @@ class ApiClient {
   }
 
   static void _log(String message) {
+    if (!kDebugMode) return;
+
     const chunkSize = 900;
 
     if (message.length <= chunkSize) {

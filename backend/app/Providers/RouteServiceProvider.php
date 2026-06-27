@@ -17,9 +17,16 @@ class RouteServiceProvider extends ServiceProvider
         $this->configureRateLimiting();
 
         $this->routes(function (): void {
+            $apiRoutes = base_path('routes/api.php');
+
             Route::middleware('api')
                 ->prefix('api')
-                ->group(base_path('routes/api.php'));
+                ->group($apiRoutes);
+
+            // Hostinger may expose /api as the FastCGI script base, leaving v1/*.
+            Route::middleware('api')
+                ->name('hostinger.')
+                ->group($apiRoutes);
 
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));

@@ -32,7 +32,7 @@ domains/iaioi.com/
 ```
 
 The file `public_html/api/index.php` is included in the Flutter web build and
-boots Laravel from `../backend`.
+boots Laravel from `api/../../backend`.
 
 If your backend folder is not named `backend`, edit:
 
@@ -47,19 +47,32 @@ and update the `$basePath` line before building Flutter.
 From the repository root on your local machine:
 
 ```powershell
-.\deployment\hostinger\build-public-html.ps1
+.\deployment\hostinger\build-public-html.ps1 `
+  -GoogleClientId "YOUR_WEB_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
 ```
 
 If Windows blocks script execution locally, use:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\deployment\hostinger\build-public-html.ps1
+powershell -NoProfile -ExecutionPolicy Bypass `
+  -File .\deployment\hostinger\build-public-html.ps1 `
+  -GoogleClientId "YOUR_WEB_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
 ```
 
 This runs:
 
 ```powershell
-flutter build web --release --base-href / --dart-define API_BASE_URL=https://iaioi.com/api/v1
+flutter build web --release --base-href / `
+  --dart-define API_BASE_URL=https://iaioi.com/api/v1 `
+  --dart-define GOOGLE_CLIENT_ID=YOUR_WEB_GOOGLE_CLIENT_ID.apps.googleusercontent.com
+```
+
+Use the same Web OAuth client ID in Flutter and Laravel. In Google Cloud, add
+these Authorized JavaScript origins to that client:
+
+```text
+https://iaioi.com
+https://www.iaioi.com
 ```
 
 Upload the contents of:
@@ -113,6 +126,15 @@ backend/storage/framework/views/*
 backend/vendor/    optional if you will run composer install on Hostinger
 ```
 
+After uploading the backend, the prepared SSH deployment script can run the
+full install, migration, seed, storage and cache sequence:
+
+```bash
+bash ~/domains/iaioi.com/backend/scripts/deploy-hostinger.sh
+```
+
+The script always targets `~/domains/iaioi.com/backend`.
+
 ## Configure Laravel Production Environment
 
 On Hostinger, copy:
@@ -133,6 +155,7 @@ Then edit these values in Hostinger File Manager or over SSH:
 APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://iaioi.com
+APP_NAME="IAIOI"
 
 DB_HOST=localhost
 DB_DATABASE=u583813446_iaioi_db
@@ -145,6 +168,7 @@ SESSION_DOMAIN=.iaioi.com
 SESSION_SECURE_COOKIE=true
 FILESYSTEM_DISK=public
 PUBLIC_STORAGE_LINK=/home/u583813446/domains/iaioi.com/public_html/storage
+GOOGLE_CLIENT_IDS=YOUR_WEB_GOOGLE_CLIENT_ID.apps.googleusercontent.com
 ```
 
 Generate the app key once on Hostinger:
@@ -259,7 +283,7 @@ curl https://iaioi.com/api/debug
 Expected health response:
 
 ```json
-{"status":"ok","database":"u583813446_iaioi_db","time":"..."}
+{"status":"ok","app_url":"https://iaioi.com","database":"u583813446_iaioi_db","db_connected":true,"php":"8.3.30","laravel":"10.x"}
 ```
 
 ## Security Checklist

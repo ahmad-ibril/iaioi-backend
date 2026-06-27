@@ -1,5 +1,6 @@
 param(
-    [string] $ApiBaseUrl = "https://iaioi.com/api/v1"
+    [string] $ApiBaseUrl = "https://iaioi.com/api/v1",
+    [string] $GoogleClientId = $env:GOOGLE_CLIENT_ID
 )
 
 $ErrorActionPreference = "Stop"
@@ -10,7 +11,13 @@ $buildRoot = Join-Path $mobileRoot "build\web"
 
 Push-Location $mobileRoot
 try {
-    flutter build web --release --base-href / --dart-define "API_BASE_URL=$ApiBaseUrl"
+    if ([string]::IsNullOrWhiteSpace($GoogleClientId)) {
+        throw "GOOGLE_CLIENT_ID is required for the production web build."
+    }
+
+    flutter build web --release --base-href / `
+        --dart-define "API_BASE_URL=$ApiBaseUrl" `
+        --dart-define "GOOGLE_CLIENT_ID=$GoogleClientId"
 } finally {
     Pop-Location
 }

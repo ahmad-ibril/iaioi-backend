@@ -9,22 +9,24 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('listing_availability_slots', function (Blueprint $table): void {
-            $table->id();
-            $table->foreignId('listing_id')->constrained()->cascadeOnDelete();
-            $table->date('date')->index();
-            $table->string('slot_name');
-            $table->time('start_time')->nullable();
-            $table->time('end_time')->nullable();
-            $table->decimal('price', 12, 2)->nullable();
-            $table->enum('status', ['available', 'reserved', 'unavailable', 'pending'])
-                ->default('available')
-                ->index();
-            $table->timestamps();
+        if (! Schema::hasTable('listing_availability_slots')) {
+            Schema::create('listing_availability_slots', function (Blueprint $table): void {
+                $table->id();
+                $table->foreignId('listing_id')->constrained()->cascadeOnDelete();
+                $table->date('date')->index();
+                $table->string('slot_name');
+                $table->time('start_time')->nullable();
+                $table->time('end_time')->nullable();
+                $table->decimal('price', 12, 2)->nullable();
+                $table->enum('status', ['available', 'reserved', 'unavailable', 'pending'])
+                    ->default('available')
+                    ->index();
+                $table->timestamps();
 
-            $table->index(['listing_id', 'date', 'status']);
-            $table->index(['listing_id', 'date', 'start_time', 'end_time']);
-        });
+                $table->index(['listing_id', 'date', 'status']);
+                $table->index(['listing_id', 'date', 'start_time', 'end_time']);
+            });
+        }
 
         if (Schema::hasTable('booking_requests')) {
             $this->normalizeBookingStatusColumn();
@@ -88,7 +90,7 @@ return new class extends Migration
 
     private function normalizePostgresStatusColumn(): void
     {
-        DB::statement("ALTER TABLE booking_requests ALTER COLUMN status TYPE VARCHAR(32) USING status::VARCHAR");
+        DB::statement('ALTER TABLE booking_requests ALTER COLUMN status TYPE VARCHAR(32) USING status::VARCHAR');
         DB::statement("ALTER TABLE booking_requests ALTER COLUMN status SET DEFAULT 'pending'");
     }
 };

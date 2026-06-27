@@ -17,7 +17,7 @@ class ArabRentalsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'iaioi | حجوزات وتأجير',
+      title: 'IAIOI',
       debugShowCheckedModeBanner: false,
       locale: const Locale('ar'),
       fallbackLocale: const Locale('en'),

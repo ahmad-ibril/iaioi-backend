@@ -214,6 +214,22 @@ class AuthController extends Controller
             ]);
         }
 
-        return $response->json();
+        $googleUser = $response->json();
+        $clientIds = config('google.client_ids', []);
+        $audience = (string) ($googleUser['aud'] ?? '');
+
+        if ($clientIds === []) {
+            throw ValidationException::withMessages([
+                'id_token' => ['تسجيل Google غير مهيأ على الخادم.'],
+            ]);
+        }
+
+        if ($audience === '' || ! in_array($audience, $clientIds, true)) {
+            throw ValidationException::withMessages([
+                'id_token' => ['رمز Google لا يخص هذا التطبيق.'],
+            ]);
+        }
+
+        return $googleUser;
     }
 }
